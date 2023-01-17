@@ -28,7 +28,9 @@ class TextDataset(Dataset):
         # load bow vocab
         with open(gconfig.bow_file_path) as f:
             self.bow_filtered_vocab_indices = json.load(f)
-        self.label2index = {'neg': [0, 1], 'pos': [1, 0]}
+        # load label2index
+        with open(gconfig.l2i_file_path) as f:
+            self.label2index = json.load(f)
 
     def _padding(self, token_ids):
         """
@@ -47,6 +49,7 @@ class TextDataset(Dataset):
         """
         token_ids = [self.word2index.get(word, gconfig.unk_token)
                      for word in sentence.split()]
+        token_ids = token_ids + [gconfig.eos_token]
         padded_token_ids = self._padding(token_ids)
         return padded_token_ids, len(token_ids)
 
@@ -60,7 +63,7 @@ class TextDataset(Dataset):
         # Iterate over each word in the sequence
         for index in text_sequence:
             if index in self.bow_filtered_vocab_indices:
-                bow_index = self.bow_filtered_vocab_indices[index]
+                bow_index = self.bow_filtered_vocab_indices[str(index)]
                 sequence_bow_representation[bow_index] += 1
         sequence_bow_representation /= np.max(
             [np.sum(sequence_bow_representation), 1])
@@ -84,5 +87,5 @@ class TextDataset(Dataset):
         sentence = self.train_data[index]
         label = self.label2index[self.train_labels[index].strip()]
         token_ids, seq_len = self._sentence_tokenid(sentence)
-        bow_rep = self._get_bow_representations(sentence)
+        bow_rep = self._get_bow_representations(token_ids)
         return (torch.LongTensor(token_ids), torch.LongTensor([seq_len]), torch.LongTensor(label), torch.FloatTensor(bow_rep))

@@ -1,5 +1,13 @@
 import re
 import logging
+import sys
+import json
+from os.path import dirname, abspath
+
+parent_dir = dirname(dirname(dirname(abspath(__file__))))
+if parent_dir not in sys.path:
+    sys.path.append(parent_dir)
+
 from linguistic_style_transfer_pytorch.config import GeneralConfig
 
 config = GeneralConfig()
@@ -54,5 +62,12 @@ class Preprocessor():
                     line = self._clean_text(line)
                     if len(line) > 0:
                         text_file.write(line + "\n")
-                        labels_file.write("pos" + "\n")
+                        labels_file.write("neg" + "\n")
+        with open(config.l2i_file_path, 'w') as label2index_file:
+            label_dict = {"neg": [0, 1], "pos": [1, 0]}
+            json.dump(label_dict, label2index_file)
         print("Processing complete ")
+
+if  __name__ == '__main__':
+    prepro = Preprocessor()
+    prepro.preprocess()

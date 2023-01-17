@@ -1,12 +1,18 @@
-from linguistic_style_transfer_pytorch.config import GeneralConfig
 import json
 import numpy as np
 import collections
 import logging
 from nltk.corpus import stopwords
-from sklearn.feature_extraction import stop_words
+from sklearn.feature_extraction import _stop_words as stop_words
 from spacy.lang.en.stop_words import STOP_WORDS as spacy_stopwords
-from gensim.models import KeyedVectors
+from gensim.models import KeyedVectors, word2vec
+from os.path import dirname, abspath
+import sys
+
+parent_dir = dirname(dirname(dirname(abspath(__file__))))
+if parent_dir not in sys.path:
+    sys.path.append(parent_dir)
+from linguistic_style_transfer_pytorch.config import GeneralConfig     
 
 # Part of Code taken from https://github.com/vineetjohn/linguistic-style-transfer/tree/master/linguistic_style_transfer_model/utils
 
@@ -50,8 +56,8 @@ class Vocab:
         emb_matrix[:len(self.config.predefined_word_index), :] = np.random.rand(
             len(self.config.predefined_word_index), self.config.embedding_size)
         # load the pretrained word embeddings
-        w2v_model = KeyedVectors.load_word2vec_format(
-            self.config.word_embedding_text_file_path).wv
+        w2v_model = word2vec.KeyedVectors.load_word2vec_format(
+            self.config.word_embedding_text_file_path)
 
         # fill the dictionary with special tokens first
         idx = 0

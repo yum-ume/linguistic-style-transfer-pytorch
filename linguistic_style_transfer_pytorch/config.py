@@ -11,15 +11,15 @@ class GeneralConfig:
     def __init__(self):
         # original vocab size
         self.vocab_size = 9200
-        self.bow_hidden_dim = 7526
+        self.bow_hidden_dim = 9200
         self.data_path = os.path.join(
             ROOT, "linguistic_style_transfer_pytorch", "data")
         self.vocab_save_path = os.path.join(
             ROOT, "linguistic_style_transfer_pytorch", "data")
         self.train_pos_reviews_file_path = os.path.join(
-            ROOT, "linguistic_style_transfer_pytorch", "data", "raw", "sentiment.train.1.txt")
+            ROOT, "linguistic_style_transfer_pytorch", "data", "raw", "sentiment.train.1")
         self.train_neg_reviews_file_path = os.path.join(
-            ROOT, "linguistic_style_transfer_pytorch", "data", "raw", "sentiment.train.0.txt")
+            ROOT, "linguistic_style_transfer_pytorch", "data", "raw", "sentiment.train.0")
         self.train_text_file_path = os.path.join(
             ROOT, "linguistic_style_transfer_pytorch", "data", "clean", "yelp_train_data.txt")
         self.train_labels_file_path = os.path.join(
@@ -36,6 +36,8 @@ class GeneralConfig:
             ROOT, "linguistic_style_transfer_pytorch", "data", "word2index.json")
         self.i2w_file_path = os.path.join(
             ROOT, "linguistic_style_transfer_pytorch", "data", "index2word.json")
+        self.l2i_file_path = os.path.join(
+            ROOT, "linguistic_style_transfer_pytorch", "data", "label2index.json")
         self.bow_file_path = os.path.join(
             ROOT, "linguistic_style_transfer_pytorch", "data", "bow.json")
         self.model_save_path = os.path.join(
@@ -45,13 +47,15 @@ class GeneralConfig:
         self.embedding_size = 300
         self.pad_token = 0
         self.sos_token = 1
-        self.unk_token = 2
+        self.eos_token = 2
+        self.unk_token = 3
         self.predefined_word_index = {
             "<pad>": 0,
             "<sos>": 1,
-            "<unk>": 2,
+            "<eos>": 2,
+            "<unk>": 3,
         }
-        self.filter_sentiment_words = True
+        self.filter_sentiment_words = False
         self.filter_stopwords = True
 
 
@@ -62,8 +66,9 @@ class ModelConfig:
 
     def __init__(self):
         # vocab size after including special tokens
-        self.vocab_size = 9203
+        self.vocab_size = 9204
         self.epochs = 20
+        self.use_prepro_embed = False
         # batch setting
         self.batch_size = 128
         # layer sizes
@@ -74,11 +79,11 @@ class ModelConfig:
         # generative embedding dim = style_hidden_dim + content_hidden_dim
         self.generative_emb_dim = 136
         self.num_style = 2
-        self.content_bow_dim = 7526
+        self.content_bow_dim = 9200
         # dropout
-        self.dropout = 0.8
+        self.dropout = 0.2 # In pytorch, the 'p' of dropout function is the probability of an element to be zeroed
         # sequence length settings
-        self.max_seq_len = 15
+        self.max_seq_len = 16
         # learning rates
         self.autoencoder_lr = 0.001
         self.style_adversary_lr = 0.001
